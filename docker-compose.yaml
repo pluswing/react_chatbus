@@ -7,5 +7,7 @@ services:
     volumes:
       - ./front:/front
     working_dir: /front
-    command: node
-    tty: true
+    command: npm start
+    ports:
+      - 3000:3000
+
