@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import red from "@material-ui/core/colors/red";
 import { Send as SendIcon } from "@material-ui/icons";
+import ChatBus from "./api";
 
 interface Props {}
 
@@ -19,6 +20,8 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.grey[500]
   }
 }));
+
+const api = new ChatBus("ws://localhost:9090/ws");
 
 interface Bus {
   name: string;
@@ -36,6 +39,17 @@ const App: React.FC<Props> = props => {
   const [hitchhikers, setHitchhikers] = useState<Hitchhiker[]>([]);
 
   useEffect(() => {
+    api.subscribe("bus_list", (list: string[]) => {
+      setChatBus(list.map(name => ({ name, selected: false })));
+    });
+    api.subscribe("hitchhiker_list", (data: any) => {
+      console.log(data);
+    });
+    api.subscribe("open", (data: any) => {
+      console.log("open!");
+      api.busList();
+      api.hitchhickerList();
+    });
     // TODO websocketからデータをもらう
     setChatBus([
       { name: "aaa", selected: false },
