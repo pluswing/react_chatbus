@@ -7,7 +7,10 @@ import {
   List,
   ListSubheader,
   ListItem,
-  ListItemText
+  ListItemText,
+  Card,
+  CardContent,
+  Typography
 } from "@material-ui/core";
 import red from "@material-ui/core/colors/red";
 import { Send as SendIcon } from "@material-ui/icons";
@@ -42,21 +45,13 @@ const App: React.FC<Props> = props => {
     api.subscribe("bus_list", (list: string[]) => {
       setChatBus(list.map(name => ({ name, selected: false })));
     });
-    api.subscribe("hitchhiker_list", (data: any) => {
-      console.log(data);
+    api.subscribe("hitchhicker_list", (data: string[]) => {
+      setHitchhikers(data.map(name => ({ name })));
     });
     api.subscribe("open", (data: any) => {
-      console.log("open!");
       api.busList();
       api.hitchhickerList();
     });
-    // TODO websocketからデータをもらう
-    setChatBus([
-      { name: "aaa", selected: false },
-      { name: "bbb", selected: false },
-      { name: "ccc", selected: false }
-    ]);
-    setHitchhikers([{ name: "user1" }, { name: "user2" }, { name: "user3" }]);
   }, [props]);
 
   return (
@@ -82,7 +77,13 @@ const App: React.FC<Props> = props => {
           </List>
         </Grid>
         <Grid item xs={6}>
-          main
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="h5" component="h2">
+                aaaaaaaaaaaa
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item xs={3} className={classes.list}>
           <List
