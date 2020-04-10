@@ -10,9 +10,10 @@ import {
   ListItemText,
   Card,
   CardContent,
-  Typography
+  Typography,
+  TextField,
+  Button
 } from "@material-ui/core";
-import red from "@material-ui/core/colors/red";
 import { Send as SendIcon } from "@material-ui/icons";
 import ChatBus from "./api";
 
@@ -54,6 +55,15 @@ const App: React.FC<Props> = props => {
     });
   }, [props]);
 
+  const [input, setInput] = useState<string>("");
+  const onChange = (event: any) => {
+    setInput(event.target.value);
+  };
+  const onSend = () => {
+    api.chat(input);
+    setInput("");
+  };
+
   return (
     <Container component="main" maxWidth="xl">
       <CssBaseline />
@@ -77,13 +87,33 @@ const App: React.FC<Props> = props => {
           </List>
         </Grid>
         <Grid item xs={6}>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="h5" component="h2">
-                aaaaaaaaaaaa
-              </Typography>
-            </CardContent>
-          </Card>
+          <Grid container>
+            <Grid item xs={12}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="h5" component="h2">
+                    aaaaaaaaaaaa
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={9}>
+              <TextField
+                label="Message"
+                multiline
+                rows="4"
+                fullWidth
+                value={input}
+                variant="outlined"
+                onChange={onChange}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <Button variant="contained" color="primary" onClick={onSend}>
+                SEND
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={3} className={classes.list}>
           <List
