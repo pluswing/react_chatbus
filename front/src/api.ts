@@ -1,3 +1,17 @@
+type SubscribeType =
+  | {
+      name: "bus_list";
+      callback: (busList: string[]) => void;
+    }
+  | { name: "hitchhicker_list"; callback: (userList: string[]) => void }
+  | { name: "open"; callback: () => void }
+  | { name: "error"; callback: () => void }
+  | { name: "chat"; callback: (/* TODO */) => void }
+  | { name: "bus_subscribed"; callback: (/* TODO */) => void }
+  | { name: "add_bus"; callback: (/* TODO */) => void }
+  | { name: "username"; callback: (/* TODO */) => void }
+  | { name: "terminate"; callback: (/* TODO */) => void };
+
 export default class ChatBus {
   private ws: WebSocket;
 
@@ -52,17 +66,15 @@ export default class ChatBus {
       })
     );
   }
-  // TODO keyをunion typeにする
-  //  | ....
 
   private subscribers: {
     [key: string]: Array<(data: any) => void>;
   } = {};
-  public subscribe(eventName: string, callback: (data: any) => void): void {
-    if (!this.subscribers[eventName]) {
-      this.subscribers[eventName] = [];
+  public subscribe(s: SubscribeType): void {
+    if (!this.subscribers[s.name]) {
+      this.subscribers[s.name] = [];
     }
-    this.subscribers[eventName].push(callback);
+    this.subscribers[s.name].push(s.callback);
   }
 
   private publish(type: string, message: any): void {

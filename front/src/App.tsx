@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Container,
   CssBaseline,
@@ -43,26 +43,38 @@ const App: React.FC<Props> = props => {
   const [hitchhikers, setHitchhikers] = useState<Hitchhiker[]>([]);
 
   useEffect(() => {
-    api.subscribe("bus_list", (list: string[]) => {
-      setChatBus(list.map(name => ({ name, selected: false })));
+    api.subscribe({
+      name: "bus_list",
+      callback: (list: string[]) => {
+        setChatBus(list.map(name => ({ name, selected: false })));
+      }
     });
-    api.subscribe("hitchhicker_list", (data: string[]) => {
-      setHitchhikers(data.map(name => ({ name })));
+    api.subscribe({
+      name: "hitchhicker_list",
+      callback: (data: string[]) => {
+        setHitchhikers(data.map(name => ({ name })));
+      }
     });
-    api.subscribe("open", (data: any) => {
-      api.busList();
-      api.hitchhickerList();
+    api.subscribe({
+      name: "open",
+      callback: () => {
+        api.busList();
+        api.hitchhickerList();
+      }
     });
   }, [props]);
 
   const [input, setInput] = useState<string>("");
-  const onChange = (event: any) => {
-    setInput(event.target.value);
-  };
-  const onSend = () => {
+  const onChange = useCallback(
+    (event: any) => {
+      setInput(event.target.value);
+    },
+    [setInput]
+  );
+  const onSend = useCallback(() => {
     api.chat(input);
     setInput("");
-  };
+  }, [setInput]);
 
   return (
     <Container component="main" maxWidth="xl">
