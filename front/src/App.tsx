@@ -72,9 +72,20 @@ const App: React.FC<Props> = props => {
     [setInput]
   );
   const onSend = useCallback(() => {
+    if (api.isEmptyName()) {
+      setUserName();
+      return;
+    }
     api.chat(input);
     setInput("");
-  }, [setInput]);
+  }, [setInput, input]);
+
+  const setUserName = () => {
+    const name = prompt("username?", "");
+    if (name) {
+      api.username(name);
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xl">

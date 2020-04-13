@@ -14,6 +14,11 @@ type SubscribeType =
 
 export default class ChatBus {
   private ws: WebSocket;
+  private name: string = "";
+
+  public isEmptyName(): boolean {
+    return this.name == "";
+  }
 
   constructor(url: string) {
     this.ws = new WebSocket(url);
@@ -39,7 +44,10 @@ export default class ChatBus {
   }
 
   public chat(message: string) {
-    this.send("chat", message);
+    this.send("chat", {
+      sender: this.name,
+      text: message
+    });
   }
 
   public busSubscribed(busName: string) {
@@ -51,6 +59,7 @@ export default class ChatBus {
   }
 
   public username(name: string) {
+    this.name = name;
     this.send("username", name);
   }
 
