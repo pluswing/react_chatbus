@@ -6,7 +6,10 @@ type SubscribeType =
   | { name: "hitchhicker_list"; callback: (userList: string[]) => void }
   | { name: "open"; callback: () => void }
   | { name: "error"; callback: () => void }
-  | { name: "chat"; callback: (/* TODO */) => void }
+  | {
+      name: "chat";
+      callback: (data: { text: string; sender: string }) => void;
+    }
   | { name: "bus_subscribed"; callback: (/* TODO */) => void }
   | { name: "add_bus"; callback: (/* TODO */) => void }
   | { name: "username"; callback: (/* TODO */) => void }
@@ -31,6 +34,7 @@ export default class ChatBus {
     };
     this.ws.onmessage = function (event): any {
       const data = JSON.parse(event.data);
+      console.log("received:", data);
       self.publish(data.type, data.msg);
     };
   }
@@ -44,10 +48,12 @@ export default class ChatBus {
   }
 
   public chat(message: string) {
-    this.send("chat", {
+    const data = {
       sender: this.name,
       text: message
-    });
+    };
+    this.send("chat", data);
+    this.publish("chat", data);
   }
 
   public busSubscribed(busName: string) {
@@ -68,6 +74,10 @@ export default class ChatBus {
   }
 
   private send(type: string, msg: any): void {
+    console.log("send:", {
+      type,
+      msg
+    });
     this.ws.send(
       JSON.stringify({
         type,

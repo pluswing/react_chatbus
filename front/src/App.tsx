@@ -36,11 +36,17 @@ interface Hitchhiker {
   name: string;
 }
 
+interface Message {
+  text: string;
+  sender: string;
+}
+
 const App: React.FC<Props> = props => {
   const classes = useStyles();
 
   const [chatBus, setChatBus] = useState<Bus[]>([]);
   const [hitchhikers, setHitchhikers] = useState<Hitchhiker[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     api.subscribe({
@@ -56,13 +62,21 @@ const App: React.FC<Props> = props => {
       }
     });
     api.subscribe({
+      name: "chat",
+      callback: (message: Message) => {
+        console.log(message);
+        setMessages([...messages, message]);
+      }
+    });
+
+    api.subscribe({
       name: "open",
       callback: () => {
         api.busList();
         api.hitchhickerList();
       }
     });
-  }, [props]);
+  }, [props, messages, setMessages, setHitchhikers, setChatBus]);
 
   const [input, setInput] = useState<string>("");
   const onChange = useCallback(
@@ -71,6 +85,7 @@ const App: React.FC<Props> = props => {
     },
     [setInput]
   );
+
   const onSend = useCallback(() => {
     if (api.isEmptyName()) {
       setUserName();
@@ -112,13 +127,15 @@ const App: React.FC<Props> = props => {
         <Grid item xs={6}>
           <Grid container>
             <Grid item xs={12}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="h5" component="h2">
-                    aaaaaaaaaaaa
-                  </Typography>
-                </CardContent>
-              </Card>
+              {messages.map(m => (
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography variant="h5" component="h2">
+                      {m.sender}: {m.text}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
             </Grid>
             <Grid item xs={9}>
               <TextField
