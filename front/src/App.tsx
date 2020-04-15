@@ -12,17 +12,22 @@ import {
   CardContent,
   Typography,
   TextField,
-  Button
+  Button,
+  ListItemSecondaryAction,
+  IconButton,
 } from "@material-ui/core";
-import { Send as SendIcon } from "@material-ui/icons";
+import { Send as SendIcon, Add as AddIcon } from "@material-ui/icons";
 import ChatBus from "./api";
 
 interface Props {}
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   list: {
-    backgroundColor: theme.palette.grey[500]
-  }
+    backgroundColor: theme.palette.grey[500],
+  },
+  messageBox: {
+    marginTop: "20px",
+  },
 }));
 
 const api = new ChatBus("ws://localhost:9090/ws");
@@ -41,7 +46,7 @@ interface Message {
   sender: string;
 }
 
-const App: React.FC<Props> = props => {
+const App: React.FC<Props> = (props) => {
   const classes = useStyles();
 
   const [chatBus, setChatBus] = useState<Bus[]>([]);
@@ -52,21 +57,21 @@ const App: React.FC<Props> = props => {
     api.subscribe({
       name: "bus_list",
       callback: (list: string[]) => {
-        setChatBus(list.map(name => ({ name, selected: false })));
-      }
+        setChatBus(list.map((name) => ({ name, selected: false })));
+      },
     });
     api.subscribe({
       name: "hitchhicker_list",
       callback: (data: string[]) => {
-        setHitchhikers(data.map(name => ({ name })));
-      }
+        setHitchhikers(data.map((name) => ({ name })));
+      },
     });
     api.subscribe({
       name: "chat",
       callback: (message: Message) => {
         console.log(message);
         setMessages([...messages, message]);
-      }
+      },
     });
 
     api.subscribe({
@@ -74,7 +79,7 @@ const App: React.FC<Props> = props => {
       callback: () => {
         api.busList();
         api.hitchhickerList();
-      }
+      },
     });
   }, [props, messages, setMessages, setHitchhikers, setChatBus]);
 
@@ -102,6 +107,17 @@ const App: React.FC<Props> = props => {
     }
   };
 
+  const addChatBus = useCallback(() => {
+    const name = prompt("busname?", "");
+    if (name) {
+      api.addBus(name);
+    }
+  }, []);
+
+  const moveBus = useCallback((busName) => {
+    api.busSubscribed(busName);
+  }, []);
+
   return (
     <Container component="main" maxWidth="xl">
       <CssBaseline />
@@ -117,27 +133,37 @@ const App: React.FC<Props> = props => {
               </ListSubheader>
             }
           >
-            {chatBus.map(bus => (
-              <ListItem button>
+            {chatBus.map((bus) => (
+              <ListItem button onClick={(e: any) => moveBus(bus.name)}>
                 <ListItemText primary={bus.name} />
               </ListItem>
             ))}
+            <ListItem>
+              <ListItemSecondaryAction>
+                <IconButton edge="end" aria-label="add" onClick={addChatBus}>
+                  <AddIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
           </List>
         </Grid>
         <Grid item xs={6}>
           <Grid container>
             <Grid item xs={12}>
-              {messages.map(m => (
+              {messages.map((m) => (
                 <Card variant="outlined">
                   <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      {m.sender}
+                    </Typography>
                     <Typography variant="h5" component="h2">
-                      {m.sender}: {m.text}
+                      {m.text}
                     </Typography>
                   </CardContent>
                 </Card>
               ))}
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={9} className={classes.messageBox}>
               <TextField
                 label="Message"
                 multiline
@@ -148,7 +174,7 @@ const App: React.FC<Props> = props => {
                 onChange={onChange}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={3} className={classes.messageBox}>
               <Button variant="contained" color="primary" onClick={onSend}>
                 SEND
               </Button>
@@ -166,7 +192,7 @@ const App: React.FC<Props> = props => {
               </ListSubheader>
             }
           >
-            {hitchhikers.map(h => (
+            {hitchhikers.map((h) => (
               <ListItem button>
                 <ListItemText primary={h.name} />
               </ListItem>
