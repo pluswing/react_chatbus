@@ -1,3 +1,7 @@
+interface Message {
+  sender: string;
+  text: string;
+}
 type SubscribeType =
   | {
       name: "bus_list";
@@ -8,12 +12,11 @@ type SubscribeType =
   | { name: "error"; callback: () => void }
   | {
       name: "chat";
-      callback: (data: { text: string; sender: string }) => void;
+      callback: (data: Message) => void;
     }
-  | { name: "bus_subscribed"; callback: (/* TODO */) => void }
-  | { name: "add_bus"; callback: (/* TODO */) => void }
-  | { name: "username"; callback: (/* TODO */) => void }
-  | { name: "terminate"; callback: (/* TODO */) => void };
+  | { name: "bus_subscribed"; callback: (busName: string) => void }
+  | { name: "username"; callback: (userName: string) => void }
+  | { name: "username_error"; callback: () => void };
 
 export default class ChatBus {
   private ws: WebSocket;
@@ -21,6 +24,10 @@ export default class ChatBus {
 
   public isEmptyName(): boolean {
     return this.name == "";
+  }
+
+  public setUserName(name: string): void {
+    this.name = name;
   }
 
   constructor(url: string) {
@@ -50,7 +57,7 @@ export default class ChatBus {
   public chat(message: string) {
     const data = {
       sender: this.name,
-      text: message
+      text: message,
     };
     this.send("chat", data);
     this.publish("chat", data);
@@ -65,7 +72,6 @@ export default class ChatBus {
   }
 
   public username(name: string) {
-    this.name = name;
     this.send("username", name);
   }
 
@@ -76,12 +82,12 @@ export default class ChatBus {
   private send(type: string, msg: any): void {
     console.log("send:", {
       type,
-      msg
+      msg,
     });
     this.ws.send(
       JSON.stringify({
         type,
-        msg
+        msg,
       })
     );
   }
@@ -97,21 +103,8 @@ export default class ChatBus {
   }
 
   private publish(type: string, message: any): void {
-    (this.subscribers[type] || []).forEach(cb => {
+    (this.subscribers[type] || []).forEach((cb) => {
       cb(message);
     });
   }
-
-  /*
-      if (e.msg_type=="chat" && (_this.username == "" || _this.username == undefined)){
-                         _this.info("Please select a username !");
-                     };
-
-                     Message = {
-                         type: e.msg_type,
-                         msg : e.message
-                     };
-                     console.log("sending ", Message);
-                     _this.ws.send(JSON.stringify(Message));
-      */
 }

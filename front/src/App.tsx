@@ -69,8 +69,19 @@ const App: React.FC<Props> = (props) => {
     api.subscribe({
       name: "chat",
       callback: (message: Message) => {
-        console.log(message);
         setMessages([...messages, message]);
+      },
+    });
+    api.subscribe({
+      name: "username_error",
+      callback: () => {
+        alert("username error!");
+      },
+    });
+    api.subscribe({
+      name: "username",
+      callback: (userName: string) => {
+        api.setUserName(userName);
       },
     });
 
@@ -114,9 +125,9 @@ const App: React.FC<Props> = (props) => {
     }
   }, []);
 
-  const moveBus = useCallback((busName) => {
+  const moveBus = (busName: string) => {
     api.busSubscribed(busName);
-  }, []);
+  };
 
   return (
     <Container component="main" maxWidth="xl">
@@ -134,7 +145,7 @@ const App: React.FC<Props> = (props) => {
             }
           >
             {chatBus.map((bus) => (
-              <ListItem button onClick={(e: any) => moveBus(bus.name)}>
+              <ListItem button onClick={() => moveBus(bus.name)}>
                 <ListItemText primary={bus.name} />
               </ListItem>
             ))}
