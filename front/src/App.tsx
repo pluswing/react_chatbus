@@ -25,6 +25,9 @@ const useStyles = makeStyles((theme) => ({
   list: {
     backgroundColor: theme.palette.grey[500],
   },
+  selected: {
+    backgroundColor: theme.palette.grey[200],
+  },
   messageBox: {
     marginTop: "20px",
   },
@@ -46,18 +49,32 @@ interface Message {
   sender: string;
 }
 
+type MessageDict = {
+  [key: string]: Message[];
+};
+
 const App: React.FC<Props> = (props) => {
   const classes = useStyles();
 
   const [chatBus, setChatBus] = useState<Bus[]>([]);
+  const [currentBusName, setCurrentBusName] = useState<string>("default");
   const [hitchhikers, setHitchhikers] = useState<Hitchhiker[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageDict>({});
 
   useEffect(() => {
     api.subscribe({
       name: "bus_list",
       callback: (list: string[]) => {
-        setChatBus(list.map((name) => ({ name, selected: false })));
+        setChatBus(
+          list.map((name) => ({ name, selected: currentBusName === name }))
+        );
+      },
+    });
+    api.subscribe({
+      name: "bus_subscribed",
+      callback: (busName: string) => {
+        setCurrentBusName(busName);
+        api.busList();
       },
     });
     api.subscribe({
@@ -69,7 +86,10 @@ const App: React.FC<Props> = (props) => {
     api.subscribe({
       name: "chat",
       callback: (message: Message) => {
-        setMessages([...messages, message]);
+        const list = messages[currentBusName] || [];
+        const newMessages = { ...messages };
+        newMessages[currentBusName] = [...list, message];
+        setMessages(newMessages);
       },
     });
     api.subscribe({
@@ -92,7 +112,14 @@ const App: React.FC<Props> = (props) => {
         api.hitchhickerList();
       },
     });
-  }, [props, messages, setMessages, setHitchhikers, setChatBus]);
+  }, [
+    props,
+    messages,
+    setMessages,
+    setHitchhikers,
+    setChatBus,
+    currentBusName,
+  ]);
 
   const [input, setInput] = useState<string>("");
   const onChange = useCallback(
@@ -145,7 +172,11 @@ const App: React.FC<Props> = (props) => {
             }
           >
             {chatBus.map((bus) => (
-              <ListItem button onClick={() => moveBus(bus.name)}>
+              <ListItem
+                button
+                className={bus.selected ? classes.selected : classes.list}
+                onClick={() => moveBus(bus.name)}
+              >
                 <ListItemText primary={bus.name} />
               </ListItem>
             ))}
@@ -161,7 +192,7 @@ const App: React.FC<Props> = (props) => {
         <Grid item xs={6}>
           <Grid container>
             <Grid item xs={12}>
-              {messages.map((m) => (
+              {(messages[currentBusName] || []).map((m) => (
                 <Card variant="outlined">
                   <CardContent>
                     <Typography color="textSecondary" gutterBottom>
