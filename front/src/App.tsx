@@ -122,14 +122,7 @@ const App: React.FC<Props> = (props) => {
         api.unsubscribe(s);
       });
     };
-  }, [
-    props,
-    messages,
-    setMessages,
-    setHitchhikers,
-    setChatBus,
-    currentBusName,
-  ]);
+  });
 
   const [input, setInput] = useState<string>("");
   const onChange = useCallback(
@@ -184,6 +177,7 @@ const App: React.FC<Props> = (props) => {
             {chatBus.map((bus) => (
               <ListItem
                 button
+                key={bus.name}
                 className={bus.selected ? classes.selected : classes.list}
                 onClick={() => moveBus(bus.name)}
               >
@@ -203,7 +197,7 @@ const App: React.FC<Props> = (props) => {
           <Grid container>
             <Grid item xs={12}>
               {(messages[currentBusName] || []).map((m) => (
-                <Card variant="outlined">
+                <Card variant="outlined" key={`${m.sender}_${m.text}`}>
                   <CardContent>
                     <Typography color="textSecondary" gutterBottom>
                       {m.sender}
@@ -245,7 +239,7 @@ const App: React.FC<Props> = (props) => {
             }
           >
             {hitchhikers.map((h) => (
-              <ListItem button>
+              <ListItem button key={h.name}>
                 <ListItemText primary={h.name} />
               </ListItem>
             ))}

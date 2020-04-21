@@ -95,12 +95,12 @@ export default class ChatBus {
 
   private publish(type: string, message: any): void {
     this.subscribers
-      .filter((s) => s.name == type)
+      .filter((s) => s.name === type)
       .forEach((s) => s.callback(message));
   }
 
   public isEmptyName(): boolean {
-    return this.name == "";
+    return this.name === "";
   }
 
   public setUserName(name: string): void {
