@@ -17,7 +17,7 @@ import {
   IconButton,
 } from "@material-ui/core";
 import { Send as SendIcon, Add as AddIcon } from "@material-ui/icons";
-import ChatBus from "./api";
+import ChatBus, { SubscribeType } from "./api";
 
 interface Props {}
 
@@ -61,29 +61,29 @@ const App: React.FC<Props> = (props) => {
   const [hitchhikers, setHitchhikers] = useState<Hitchhiker[]>([]);
   const [messages, setMessages] = useState<MessageDict>({});
 
-  useEffect(() => {
-    api.subscribe({
+  const subscribes: SubscribeType[] = [
+    {
       name: "bus_list",
       callback: (list: string[]) => {
         setChatBus(
           list.map((name) => ({ name, selected: currentBusName === name }))
         );
       },
-    });
-    api.subscribe({
+    },
+    {
       name: "bus_subscribed",
       callback: (busName: string) => {
         setCurrentBusName(busName);
         api.busList();
       },
-    });
-    api.subscribe({
+    },
+    {
       name: "hitchhicker_list",
       callback: (data: string[]) => {
         setHitchhikers(data.map((name) => ({ name })));
       },
-    });
-    api.subscribe({
+    },
+    {
       name: "chat",
       callback: (message: Message) => {
         const list = messages[currentBusName] || [];
@@ -91,27 +91,37 @@ const App: React.FC<Props> = (props) => {
         newMessages[currentBusName] = [...list, message];
         setMessages(newMessages);
       },
-    });
-    api.subscribe({
+    },
+    {
       name: "username_error",
       callback: () => {
         alert("username error!");
       },
-    });
-    api.subscribe({
+    },
+    {
       name: "username",
       callback: (userName: string) => {
         api.setUserName(userName);
       },
-    });
-
-    api.subscribe({
+    },
+    {
       name: "open",
       callback: () => {
         api.busList();
         api.hitchhickerList();
       },
+    },
+  ];
+
+  useEffect(() => {
+    subscribes.forEach((s) => {
+      api.subscribe(s);
     });
+    return () => {
+      subscribes.forEach((s) => {
+        api.unsubscribe(s);
+      });
+    };
   }, [
     props,
     messages,

@@ -2,7 +2,7 @@ interface Message {
   sender: string;
   text: string;
 }
-type SubscribeType =
+export type SubscribeType =
   | {
       name: "bus_list";
       callback: (busList: string[]) => void;
@@ -21,14 +21,6 @@ type SubscribeType =
 export default class ChatBus {
   private ws: WebSocket;
   private name: string = "";
-
-  public isEmptyName(): boolean {
-    return this.name == "";
-  }
-
-  public setUserName(name: string): void {
-    this.name = name;
-  }
 
   constructor(url: string) {
     this.ws = new WebSocket(url);
@@ -92,19 +84,26 @@ export default class ChatBus {
     );
   }
 
-  private subscribers: {
-    [key: string]: Array<(data: any) => void>;
-  } = {};
+  private subscribers: SubscribeType[] = [];
   public subscribe(s: SubscribeType): void {
-    if (!this.subscribers[s.name]) {
-      this.subscribers[s.name] = [];
-    }
-    this.subscribers[s.name].push(s.callback);
+    this.subscribers.push(s);
+  }
+
+  public unsubscribe(s: SubscribeType): void {
+    this.subscribers = this.subscribers.filter((v) => v !== s);
   }
 
   private publish(type: string, message: any): void {
-    (this.subscribers[type] || []).forEach((cb) => {
-      cb(message);
-    });
+    this.subscribers
+      .filter((s) => s.name == type)
+      .forEach((s) => s.callback(message));
+  }
+
+  public isEmptyName(): boolean {
+    return this.name == "";
+  }
+
+  public setUserName(name: string): void {
+    this.name = name;
   }
 }
