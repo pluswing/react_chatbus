@@ -18,6 +18,8 @@ import {
 } from "@material-ui/core";
 import { Send as SendIcon, Add as AddIcon } from "@material-ui/icons";
 import ChatBus, { SubscribeType } from "./api";
+import { Bus, Hitchhiker, Message, MessageDict } from "./types";
+import Hitchhikers from "./Hitchhikers";
 
 interface Props {}
 
@@ -34,24 +36,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const api = new ChatBus("ws://localhost:9090/ws");
-
-interface Bus {
-  name: string;
-  selected: boolean;
-}
-
-interface Hitchhiker {
-  name: string;
-}
-
-interface Message {
-  text: string;
-  sender: string;
-}
-
-type MessageDict = {
-  [key: string]: Message[];
-};
 
 const App: React.FC<Props> = (props) => {
   const classes = useStyles();
@@ -228,22 +212,7 @@ const App: React.FC<Props> = (props) => {
           </Grid>
         </Grid>
         <Grid item xs={3} className={classes.list}>
-          <List
-            component="nav"
-            aria-labelledby="nested-list-subheader"
-            subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
-                <SendIcon />
-                hitchhikers
-              </ListSubheader>
-            }
-          >
-            {hitchhikers.map((h) => (
-              <ListItem button key={h.name}>
-                <ListItemText primary={h.name} />
-              </ListItem>
-            ))}
-          </List>
+          <Hitchhikers list={hitchhikers} />
         </Grid>
       </Grid>
     </Container>
