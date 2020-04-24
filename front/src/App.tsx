@@ -4,22 +4,14 @@ import {
   CssBaseline,
   Grid,
   makeStyles,
-  List,
-  ListSubheader,
-  ListItem,
-  ListItemText,
-  Card,
-  CardContent,
-  Typography,
   TextField,
   Button,
-  ListItemSecondaryAction,
-  IconButton,
 } from "@material-ui/core";
-import { Send as SendIcon, Add as AddIcon } from "@material-ui/icons";
 import ChatBus, { SubscribeType } from "./api";
 import { Bus, Hitchhiker, Message, MessageDict } from "./types";
 import Hitchhikers from "./Hitchhikers";
+import ChatBusView from "./ChatBus";
+import ChatHistory from "./ChatHistory";
 
 interface Props {}
 
@@ -148,50 +140,12 @@ const App: React.FC<Props> = (props) => {
       <CssBaseline />
       <Grid container spacing={3}>
         <Grid item xs={3} className={classes.list}>
-          <List
-            component="nav"
-            aria-labelledby="nested-list-subheader"
-            subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
-                <SendIcon />
-                ChatBus
-              </ListSubheader>
-            }
-          >
-            {chatBus.map((bus) => (
-              <ListItem
-                button
-                key={bus.name}
-                className={bus.selected ? classes.selected : classes.list}
-                onClick={() => moveBus(bus.name)}
-              >
-                <ListItemText primary={bus.name} />
-              </ListItem>
-            ))}
-            <ListItem>
-              <ListItemSecondaryAction>
-                <IconButton edge="end" aria-label="add" onClick={addChatBus}>
-                  <AddIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          </List>
+          <ChatBusView list={chatBus} add={addChatBus} move={moveBus} />
         </Grid>
         <Grid item xs={6}>
           <Grid container>
             <Grid item xs={12}>
-              {(messages[currentBusName] || []).map((m) => (
-                <Card variant="outlined" key={`${m.sender}_${m.text}`}>
-                  <CardContent>
-                    <Typography color="textSecondary" gutterBottom>
-                      {m.sender}
-                    </Typography>
-                    <Typography variant="h5" component="h2">
-                      {m.text}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
+              <ChatHistory list={messages[currentBusName] || []} />
             </Grid>
             <Grid item xs={9} className={classes.messageBox}>
               <TextField
