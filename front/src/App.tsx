@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Container, CssBaseline, Grid, makeStyles } from "@material-ui/core";
 import ChatBus, { SubscribeType } from "./api";
 import { Bus, Hitchhiker, Message, MessageDict } from "./types";
-import Hitchhikers from "./Hitchhikers";
-import ChatBusView from "./ChatBus";
-import ChatHistory from "./ChatHistory";
-import InputView from "./Input";
+import Hitchhikers from "./components/Hitchhikers";
+import ChatBusView from "./components/ChatBus";
+import ChatHistory from "./components/ChatHistory";
+import InputView from "./components/Input";
 
 interface Props {}
 

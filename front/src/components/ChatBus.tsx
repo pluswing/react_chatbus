@@ -9,7 +9,7 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import { Send as SendIcon, Add as AddIcon } from "@material-ui/icons";
-import { Bus } from "./types";
+import { Bus } from "../types";
 
 const useStyles = makeStyles((theme) => ({
   unselected: {},

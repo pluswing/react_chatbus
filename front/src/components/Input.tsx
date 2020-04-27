@@ -11,7 +11,7 @@ interface Props {
   onSend: (input: string) => void;
 }
 
-const ChatHistory: React.FC<Props> = ({ onSend }: Props) => {
+const Input: React.FC<Props> = ({ onSend }: Props) => {
   const classes = useStyles();
 
   const [input, setInput] = useState<string>("");
@@ -47,4 +47,4 @@ const ChatHistory: React.FC<Props> = ({ onSend }: Props) => {
   );
 };
 
-export default ChatHistory;
+export default Input;

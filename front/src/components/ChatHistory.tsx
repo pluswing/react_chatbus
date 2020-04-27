@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, Typography } from "@material-ui/core";
-import { Message } from "./types";
+import { Message } from "../types";
 
 interface Props {
   list: Message[];

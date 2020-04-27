@@ -1,7 +1,7 @@
 import React from "react";
 import { List, ListSubheader, ListItem, ListItemText } from "@material-ui/core";
 import { Send as SendIcon } from "@material-ui/icons";
-import { Hitchhiker } from "./types";
+import { Hitchhiker } from "../types";
 
 interface Props {
   list: Hitchhiker[];
