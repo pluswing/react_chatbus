@@ -1,29 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Container,
-  CssBaseline,
-  Grid,
-  makeStyles,
-  TextField,
-  Button,
-} from "@material-ui/core";
+import { Container, CssBaseline, Grid, makeStyles } from "@material-ui/core";
 import ChatBus, { SubscribeType } from "./api";
 import { Bus, Hitchhiker, Message, MessageDict } from "./types";
 import Hitchhikers from "./Hitchhikers";
 import ChatBusView from "./ChatBus";
 import ChatHistory from "./ChatHistory";
+import InputView from "./Input";
 
 interface Props {}
 
 const useStyles = makeStyles((theme) => ({
   list: {
     backgroundColor: theme.palette.grey[500],
-  },
-  selected: {
-    backgroundColor: theme.palette.grey[200],
-  },
-  messageBox: {
-    marginTop: "20px",
   },
 }));
 
@@ -100,22 +88,13 @@ const App: React.FC<Props> = (props) => {
     };
   });
 
-  const [input, setInput] = useState<string>("");
-  const onChange = useCallback(
-    (event: any) => {
-      setInput(event.target.value);
-    },
-    [setInput]
-  );
-
-  const onSend = useCallback(() => {
+  const onSend = useCallback((input: string) => {
     if (api.isEmptyName()) {
       setUserName();
       return;
     }
     api.chat(input);
-    setInput("");
-  }, [setInput, input]);
+  }, []);
 
   const setUserName = () => {
     const name = prompt("username?", "");
@@ -131,9 +110,9 @@ const App: React.FC<Props> = (props) => {
     }
   }, []);
 
-  const moveBus = (busName: string) => {
+  const moveBus = useCallback((busName: string) => {
     api.busSubscribed(busName);
-  };
+  }, []);
 
   return (
     <Container component="main" maxWidth="xl">
@@ -147,22 +126,7 @@ const App: React.FC<Props> = (props) => {
             <Grid item xs={12}>
               <ChatHistory list={messages[currentBusName] || []} />
             </Grid>
-            <Grid item xs={9} className={classes.messageBox}>
-              <TextField
-                label="Message"
-                multiline
-                rows="4"
-                fullWidth
-                value={input}
-                variant="outlined"
-                onChange={onChange}
-              />
-            </Grid>
-            <Grid item xs={3} className={classes.messageBox}>
-              <Button variant="contained" color="primary" onClick={onSend}>
-                SEND
-              </Button>
-            </Grid>
+            <InputView onSend={onSend} />
           </Grid>
         </Grid>
         <Grid item xs={3} className={classes.list}>
