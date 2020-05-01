@@ -6,6 +6,7 @@ import Hitchhikers from "./components/Hitchhikers";
 import ChatBusView from "./components/ChatBus";
 import ChatHistory from "./components/ChatHistory";
 import InputView from "./components/Input";
+import Employee from "./components/Employee";
 
 interface Props {}
 
@@ -124,6 +125,7 @@ const App: React.FC<Props> = (props) => {
         <Grid item xs={6}>
           <Grid container>
             <Grid item xs={12}>
+              <Employee id={3} />
               <ChatHistory list={messages[currentBusName] || []} />
             </Grid>
             <InputView onSend={onSend} />
